@@ -1778,6 +1778,7 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
 
     override fun surfaceCreated(holder: SurfaceHolder) {
         if (holder !== outputHolder()) return
+        surfaceRotation = currentDisplayRotation()
         if (installingRuntime || SessionState.stopRequested || ended) return
         if (!SessionState.running) {
             SessionEvents.transition(SessionPhase.STARTING_COMPOSITOR, "compositor.starting")
@@ -1876,15 +1877,22 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
 
     private var surfaceW = 0
     private var surfaceH = 0
+    private var surfaceRotation = -1
+
+    private fun currentDisplayRotation(): Int =
+        (if (Build.VERSION.SDK_INT >= 30) display else windowManager.defaultDisplay)?.rotation ?: android.view.Surface.ROTATION_0
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
         if (holder !== outputHolder()) return
+        val currentRotation = currentDisplayRotation()
+        val rotated = surfaceRotation != -1 && currentRotation != surfaceRotation
         val resized = surfaceW != 0 && (width != surfaceW || height != surfaceH)
         surfaceW = width
         surfaceH = height
-        if (resized) {
+        surfaceRotation = currentRotation
+        if (resized || rotated) {
             cancelTouchGestures()
-            Log.i(TAG, "surface resized to ${width}x$height - rebinding the compositor")
+            Log.i(TAG, "surface resized to ${width}x$height (rotated=$rotated) - rebinding the compositor")
             CompositorHost.resize(holder.surface) { applyFrameGen() }
             followWindow(width, height)
         }
@@ -1924,6 +1932,15 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
         cancelTouchGestures()
         applyFollowOrientation(newConfig)
         applyUnfoldedControls()
+        val currentRotation = currentDisplayRotation()
+        if (surfaceRotation != -1 && currentRotation != surfaceRotation) {
+            surfaceRotation = currentRotation
+            outputHolder()?.surface?.let { surface ->
+                if (surface.isValid && CompositorHost.isStarted) {
+                    CompositorHost.resize(surface) { applyFrameGen() }
+                }
+            }
+        }
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
@@ -1933,6 +1950,7 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
         cancelTouchGestures()
         surfaceW = 0
         surfaceH = 0
+        surfaceRotation = -1
         glassesOutputActive = false
         CompositorHost.detach(holder.surface)
     }

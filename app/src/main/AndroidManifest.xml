@@ -157,7 +157,7 @@
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|density"
             android:theme="@style/AppTheme" />
 
-        <activity android:name=".stores.xbox.XboxLoginActivity" android:exported="false"
+        <activity android:name=".stores.xbox.XboxLoginActivity" android:exported="false" android:screenOrientation="sensorLandscape"
             android:process=":xboxlogin" android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|density"
             android:theme="@style/AppTheme" />
 
@@ -178,7 +178,7 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|density|navigation|uiMode"
             android:theme="@style/AppTheme" />
 
-        <activity android:name=".stores.xbox.XboxCloudSettingsActivity" android:exported="false"
+        <activity android:name=".stores.xbox.XboxCloudSettingsActivity" android:exported="false" android:screenOrientation="sensorLandscape"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|density"
             android:theme="@style/AppTheme" />
 
@@ -191,6 +191,7 @@
 
         <activity
             android:name=".agent.AgentStartActivity"
+            android:screenOrientation="sensorLandscape"
             android:exported="true"
             android:excludeFromRecents="true"
             android:noHistory="true"
@@ -257,7 +258,7 @@
             android:exported="true"
             android:permission="android.permission.DUMP"
             android:grantUriPermissions="false" />
-        <activity android:name=".ui.SpatialTrackingActivity" android:exported="false" />
+        <activity android:name=".ui.SpatialTrackingActivity" android:exported="false" android:screenOrientation="sensorLandscape" />
         <service
             android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
             tools:node="merge">

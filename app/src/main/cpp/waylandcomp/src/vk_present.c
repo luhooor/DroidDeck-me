@@ -1773,8 +1773,8 @@ static int render_impl(int scene_w, int scene_h, const struct vkp_draw *draws, i
         destroy_swapchain();
         return -1;
     } else if (pr == VK_SUBOPTIMAL_KHR || ar == VK_SUBOPTIMAL_KHR) {
-        static int said;
-        if (!said) { said = 1; droiddeck_log("gpu", "surface reports SUBOPTIMAL (panel rotation); presenting as is"); }
+        g_surface_checked_ns = 0;
+        check_surface_changed();
     } else if (pr != VK_SUCCESS) {
         droiddeck_log("error", "present: vkQueuePresentKHR failed (%s %d)", vk_result_name(pr), (int)pr);
         destroy_swapchain();
